@@ -1,172 +1,55 @@
-# Neural Trajectory Analysis Dashboard
+# Neural Trajectory Explorer
 
-A comprehensive interactive dashboard for analyzing neural trajectory data with dual coordinate systems, crossing detection, and encoding manifold visualization.
+An interactive dashboard for exploring how populations of neurons respond over time. Compare trajectories in PCA space or in the activity coordinates of three neurons, inspect nearby trajectory crossings, and explore retinal and V1 encoding manifolds.
 
-## 🎯 Core Features
+![Retinal encoding manifold with neurons shown as colored points](docs/neural-trajectory-preview.webp)
 
-### **Dual Coordinate Systems**
-- **PCA Coordinates**: Dimensionality-reduced trajectories for population-level analysis
-- **Neuron Coordinates**: Raw 3-neuron trajectories with encoding manifold integration
+*A retinal encoding manifold from the project, also featured on [my website](https://skfile.github.io/#projects).*
 
-### **Interactive 3D Visualizations** 
-- Animated trajectory plots with play/pause/slider controls
-- Real-time crossing detection with adjustable spatial (ε) and temporal (δ) thresholds
-- Hover information showing stimulus/orientation details
-- Interactive legends for selective trace display
+## What you can explore
 
-### **Advanced Analysis Tools**
-- Selective trace plotting with checkbox controls and Select All/Deselect All
-- Encoding manifold iframe integration for neuron coordinate visualizations  
-- Real-time crossing statistics and trajectory metrics
-- PSTH (Peristimulus Time Histogram) analysis for individual neurons
+- Switch between retina and V1 recordings, and between PCA and neuron coordinates.
+- Animate responses to different visual stimuli and select individual traces.
+- Adjust spatial and temporal thresholds to inspect trajectory crossings.
+- View encoding manifolds alongside trajectories and examine per-neuron response histograms.
 
-### **Technical Excellence**
-- **Fixed Path Resolution**: Reliable file discovery regardless of execution context
-- **Module-Level Caching**: Optimized performance with smart data management
-- **Fresh Plot Generation**: Always accurate, never stale cached results
-- **Responsive UI**: Bootstrap-styled interface with professional appearance
+## Run locally
 
-### 🎛️ Interactive Controls
-- **Parameter Selection**: Epsilon (0.5, 1.0, 1.5) and Delta (3, 5, 7) presets
-- **Region Selection**: Retina and V1 datasets
-- **Triplet Selection**: Choose from available neuron triplets for neuron coordinates
-- **Trace Selection**: Checkboxes for individual stimulus/orientation pairs with Select All/Deselect All
-- **Crossing Toggle**: Enable/disable crossing detection and visualization
+Use Python 3.10 with the pinned dependencies:
 
-### 📊 Enhanced Visualization
-- **Descriptive Trace Names**: Hover over traces to see stimulus/orientation names (e.g., "Grating W12 - 0°")
-- **Interactive Legends**: Click to show/hide individual traces
-- **Real-time Statistics**: Crossing counts and averages computed on-demand
-- **Loading Feedback**: Clear indicators during computation
-
-## Installation & Setup
-
-### Prerequisites
 ```bash
-pip install -r requirements.txt
-```
-
-### Data Requirements
-Ensure the following files are in the `data/` directory:
-- `retina_tensor_traces.npy`
-- `V1_tensor_traces.npy`
-- `retina_cell_info.pkl`
-- `V1_cell_info.pkl`
-
-### Encoding Manifold Files
-Place HTML encoding manifold files in the root directory with naming pattern:
-- `{region}_{distance}_triplet_{instance}_neurons_{neuron1}_{neuron2}_{neuron3}.html`
-
-## Usage
-
-### Running the Dashboard
-```bash
-python neural_trajectory_dashboard.py
-```
-Access at: `http://127.0.0.1:8050`
-
-### Performance Note
-The dashboard generates plots fresh for each request to ensure accuracy with trace filtering. While this may take 30-200 seconds for complex configurations, it guarantees correct visualization of selected traces.
-
-## File Structure
-
-```
-neuron_analysis_results/
-├── neural_trajectory_dashboard.py    # Main dashboard application
-├── generate_cached_plots.py          # Cache generation script
-├── enhanced_trajectory_visualization.py  # Core analysis functions
-├── data/                             # Neural data files
-├── plot_cache/                       # Cache directory (disabled)
-│   └── (cache files not used)
-├── requirements.txt                  # Python dependencies
-├── Procfile                         # Heroku deployment config
-├── render.yaml                      # Render deployment config
-├── .gitignore                       # Git ignore rules
-└── README.md                        # This file
-```
-
-## Performance System
-
-### Current Approach
-- **Fresh Generation**: Each plot is generated from scratch for accuracy
-- **Trace Filtering**: Only selected stimulus/orientation pairs are plotted
-- **Real-time Statistics**: Crossing detection computed for current configuration
-- **Optimized Computation**: Efficient algorithms for trajectory analysis
-
-### Performance Characteristics
-- **Plot Generation**: 30-200 seconds for complex configurations
-- **Memory Usage**: Optimized for web deployment
-- **Accuracy**: Guaranteed correct visualization of selected traces
-- **Reliability**: No cache-related issues or inconsistencies
-
-## Deployment
-
-### Local Development
-```bash
+git clone https://github.com/skfile/traceDashboard.git neural-trajectory-explorer
+cd neural-trajectory-explorer
+python3.10 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
 python neural_trajectory_dashboard.py
 ```
 
-### Render Deployment
-The project includes `render.yaml` for easy deployment on Render:
-- Automatic Python environment setup
-- Port configuration for web services
-- Build and start commands
+Open <http://127.0.0.1:8050>. On Windows, activate the environment with `.venv\Scripts\activate`.
 
-### Heroku Deployment
-The project includes `Procfile` for Heroku deployment:
-```bash
-web: python neural_trajectory_dashboard.py
+The repository includes the neural recordings and example manifold HTML files needed by the dashboard. Start with a small selection of traces; complex configurations may take 30–200 seconds to generate, as noted in the original implementation.
+
+## Data and layout
+
+```text
+neural_trajectory_dashboard.py       Dashboard and controls
+enhanced_trajectory_visualization.py Trajectory analysis and plotting
+data/                              Retina and V1 recordings and cell metadata
+encodingMans/                      Interactive encoding manifold HTML files
+STIMULUS_MAPPING_DOCUMENTATION.md   Stimulus labels and mapping notes
+requirements.txt                   Python dependencies
+render.yaml / Procfile             Deployment configuration
 ```
 
-## Technical Details
+The `data/` directory contains `retina_tensor_traces.npy`, `V1_tensor_traces.npy`, `retina_cell_info.pkl`, and `V1_cell_info.pkl`. Keep these files in place when running the application.
 
-### Key Functions
-- `extract_trajectories_for_region()`: Extract PCA or neuron coordinates
-- `detect_crossings_with_temporal_constraint()`: Find trajectory intersections
-- `create_3d_trajectory_animation()`: Generate interactive 3D plots
-- `parse_triplet_filename()`: Extract neuron indices from HTML filenames
-- `update_trace_checkboxes()`: Manage trace selection interface
+Manifold files are supplied in `encodingMans/`, using names such as `retina_close_triplet_1_neurons_219_908_325.html`. The application also checks the repository root for files with the same naming pattern.
 
-### Data Flow
-1. **Data Loading**: Neural traces loaded from `.npy` files
-2. **Trajectory Extraction**: PCA or neuron coordinates computed
-3. **Trace Filtering**: Selected stimulus/orientation pairs filtered
-4. **Visualization**: 3D animation with optional crossing events
-5. **Statistics**: Real-time computation of crossing statistics
+## Notes
 
-### Error Handling
-- Clear error messages for missing data
-- Robust checkbox parsing and trace filtering
-- Safe file path handling for encoding manifolds
-- Graceful handling of computation timeouts
+Plots are computed on demand. Reducing the number of traces or disabling crossing detection can reduce wait times. The default local port is `8050`; deployment settings can override it through `PORT`.
 
-## Troubleshooting
+If data or manifold files cannot be found, check the directory layout above. For stimulus naming, see [the mapping documentation](STIMULUS_MAPPING_DOCUMENTATION.md).
 
-### Common Issues
-1. **"Module not found"**: Ensure all dependencies installed via `requirements.txt`
-2. **"No data files"**: Check `data/` directory contains required `.npy` and `.pkl` files
-3. **"No manifold files"**: Verify HTML encoding manifold files are in root directory
-4. **Slow plot generation**: Complex configurations may take 30-200 seconds to compute
-
-### Debug Information
-The dashboard includes extensive debug logging:
-- Parameter values and selections
-- Trajectory extraction progress
-- Crossing detection results
-- File path resolution
-- Trace filtering operations
-
-## Performance Tips
-
-1. **Selective Traces**: Use checkboxes to plot only needed traces for faster generation
-2. **Parameter Optimization**: Start with smaller epsilon/delta values for quicker computation
-3. **Crossing Toggle**: Disable crossing detection when not needed to save computation time
-4. **Memory Management**: Close unused browser tabs to free memory
-
-## Future Enhancements
-
-- [ ] Additional coordinate systems
-- [ ] More sophisticated crossing detection algorithms
-- [ ] Export functionality for plots and statistics
-- [ ] Batch processing for multiple configurations
-- [ ] Real-time data streaming capabilities 
+The preview image is reused from the personal website and depicts a manifold from this repository; it is not a screenshot of the full dashboard interface.
