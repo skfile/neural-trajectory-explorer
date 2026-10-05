@@ -18,7 +18,7 @@ An interactive dashboard for exploring how populations of neurons respond over t
 Use Python 3.10 with the pinned dependencies:
 
 ```bash
-git clone https://github.com/skfile/traceDashboard.git neural-trajectory-explorer
+git clone https://github.com/skfile/neural-trajectory-explorer.git
 cd neural-trajectory-explorer
 python3.10 -m venv .venv
 source .venv/bin/activate
